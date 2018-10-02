@@ -1,12 +1,12 @@
-package mashup
+package engine
 
 import (
 	"math/rand"
 )
 
 type Matrix struct {
-	Lines      []Line
-	LineMatrix map[int][]int
+	Lines          []Line
+	LineIndexPairs map[int][]int
 }
 
 func NewMatrixGenerator(matrix Matrix) Generator {
@@ -29,14 +29,17 @@ func getLinePair(matrix Matrix, history map[int]bool) (Line, Line) {
 		}
 
 		// grab another line if this one doesn't have any pairs
-		pairs := matrix.LineMatrix[firstLineIndex]
+		pairs := matrix.LineIndexPairs[firstLineIndex]
 		if len(pairs) == 0 {
 			continue
 		}
 
-		// choose a random pair for the first line
+		// choose a random pair for the first line that hasn't already been used
 		pairIndex := rand.Intn(len(pairs))
 		secondLineIndex := pairs[pairIndex]
+		if history[secondLineIndex] {
+			continue
+		}
 
 		// update our history for both lines
 		history[firstLineIndex] = true

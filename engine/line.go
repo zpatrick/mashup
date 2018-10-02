@@ -1,4 +1,4 @@
-package mashup
+package engine
 
 import "strings"
 

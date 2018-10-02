@@ -13,7 +13,7 @@ import (
 	"github.com/urfave/cli"
 	"github.com/zpatrick/fireball"
 	"github.com/zpatrick/mashup/controllers"
-	"github.com/zpatrick/mashup/mashup"
+	"github.com/zpatrick/mashup/engine"
 )
 
 func main() {
@@ -22,6 +22,10 @@ func main() {
 	app.Name = "mashup"
 	app.Usage = "Mashup Generator"
 	app.Flags = []cli.Flag{
+		cli.BoolFlag{
+			Name:   "d, debug",
+			EnvVar: "MASHUP_DEBUG",
+		},
 		cli.IntFlag{
 			Name:   "p, port",
 			EnvVar: "MASHUP_PORT",
@@ -34,6 +38,14 @@ func main() {
 		},
 	}
 
+	app.Before = func(c *cli.Context) error {
+		if !c.Bool("debug") {
+			log.SetOutput(ioutil.Discard)
+		}
+
+		return nil
+	}
+
 	app.Action = func(c *cli.Context) error {
 		rand.Seed(time.Now().UnixNano())
 
@@ -43,12 +55,12 @@ func main() {
 			return fmt.Errorf("Failed to load matrix file '%s': %s", path, err.Error())
 		}
 
-		var matrix mashup.Matrix
+		var matrix engine.Matrix
 		if err := json.Unmarshal(bytes, &matrix); err != nil {
 			return fmt.Errorf("Failed to unmarshal matrix: %s", err.Error())
 		}
 
-		generator := mashup.NewMatrixGenerator(matrix)
+		generator := engine.NewMatrixGenerator(matrix)
 		rootController := controllers.NewRootController(generator)
 		app := fireball.NewApp(rootController.Routes())
 		http.Handle("/", app)
@@ -57,7 +69,7 @@ func main() {
 		http.Handle("/static/", http.StripPrefix("/static", fs))
 
 		addr := fmt.Sprintf("0.0.0.0:%d", c.Int("port"))
-		log.Printf("[INFO] Listening on %s\n", addr)
+		log.Printf("Listening on %s\n", addr)
 		return http.ListenAndServe(addr, nil)
 	}
 

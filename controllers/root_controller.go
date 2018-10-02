@@ -2,14 +2,14 @@ package controllers
 
 import (
 	"github.com/zpatrick/fireball"
-	"github.com/zpatrick/mashup/mashup"
+	"github.com/zpatrick/mashup/engine"
 )
 
 type RootController struct {
-	generator mashup.Generator
+	generator engine.Generator
 }
 
-func NewRootController(g mashup.Generator) *RootController {
+func NewRootController(g engine.Generator) *RootController {
 	return &RootController{
 		generator: g,
 	}

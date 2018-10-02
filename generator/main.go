@@ -71,9 +71,9 @@ func main() {
 		lines = append(lines, songLines...)
 	}
 
-	lineMatrix := map[int][]int{}
+	lineIndexPairs := map[int][]int{}
 	for i := 0; i < len(lines); i++ {
-		lineMatrix[i] = []int{}
+		lineIndexPairs[i] = []int{}
 		wordA := strings.ToLower(lines[i].LastWord())
 
 		for j := 0; j < len(lines); j++ {
@@ -84,7 +84,7 @@ func main() {
 			wordB := strings.ToLower(lines[j].LastWord())
 			for _, word := range rhymeMap[wordA] {
 				if strings.ToLower(word) == wordB {
-					lineMatrix[i] = append(lineMatrix[i], j)
+					lineIndexPairs[i] = append(lineIndexPairs[i], j)
 					break
 				}
 			}
@@ -92,8 +92,8 @@ func main() {
 	}
 
 	matrix := mashup.Matrix{
-		Lines:      lines,
-		LineMatrix: lineMatrix,
+		Lines:          lines,
+		LineIndexPairs: lineIndexPairs,
 	}
 
 	data, err := json.Marshal(matrix)
